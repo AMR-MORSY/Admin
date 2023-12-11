@@ -21,13 +21,13 @@
 
                             </span>
 
-                            <input class="form-control " :class="{ 'is-invalid':v$.email.$errors.length }" type="text"
+                            <input class="form-control " :class="{ 'is-invalid': v$.email.$errors.length }" type="text"
                                 v-model.trim="state.email" aria-describedby="email" />
 
 
 
                         </div>
-                        <div v-if=" v$.email.$errors">
+                        <div v-if="v$.email.$errors">
                             <div style="color: red; font-size: 0.7rem; padding-left: 3px; padding-top: 3px;"
                                 v-for="error in v$.email.$errors">
                                 {{ error.$message }}</div>
@@ -79,14 +79,15 @@
 
 <script >
 import { useVuelidate } from '@vuelidate/core'
-import { required, email,helpers } from '@vuelidate/validators'
+import { required, email, helpers } from '@vuelidate/validators'
 import { reactive } from 'vue';
 import signUp from '../../Api/signUp';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast';
 
 export default {
-    name:"Login",
+    name: "Login",
     setup() {
         const state = reactive({
             email: '',
@@ -100,35 +101,92 @@ export default {
             password: { required: helpers.withMessage('Password is required', required) }, // Matches state.lastName
 
         }
+        const toast = useToast();
 
         const v$ = useVuelidate(rules, state);
-        const store=useStore();
-        const router=useRouter();
+        const store = useStore();
+        const router = useRouter();
         async function submitLoginForm() {
             const isFormCorrect = await this.v$.$validate()
             if (!isFormCorrect) return
-            signUp.adminSignUp(state).then((response)=>{
+            signUp.adminSignUp(state).then((response) => {
+                console.log(response)
                 if (response.data.message == "User loged in successfully") {
-            sessionStorage.setItem(
-              "User",
-              JSON.stringify(response.data.user_data)
-            );
-            store.dispatch("userData", response.data.user_data);
+                    sessionStorage.setItem(
+                        "User",
+                        JSON.stringify(response.data.user_data)
+                    );
+                    store.dispatch("userData", response.data.user_data);
 
-            router.push({
-              path: "/dashboard",
-            });
+                    router.push({
+                        path: "/dashboard",
+                    });
 
-          }
-        
-         
+                }
 
 
+            }).catch((error) => {
+               
+                if(error.response)
+                {
+                    console.log(error)
+                    if (error.response.status == 422) {
+                    if (error.response.data.errors) {
+                        let errors = error.response.data.errors;
+                        if (errors.email) {
+                            errors.email.forEach((element) => {
+                                toast.add({
+                                    severity: "error",
+                                    summary: "Error Message",
+                                    detail: element,
+                                    life: 3000,
 
-            }).catch((error)=>{
+                                })
+                            })
+                        }
+                        if(errors.password)
+                        {
+                            errors.password.forEach((element) => {
+                                toast.add({
+                                    severity: "error",
+                                    summary: "Error Message",
+                                    detail: element,
+                                    life: 3000,
+
+                                })
+                            })
+
+                        }
+
+                    }
+                    else if (error.response.data.message) {
+                        toast.add({
+                            severity: "error",
+                            summary: "Error Message",
+                            detail: error.response.data.message,
+                            life: 3000,
+
+                        })
+
+                    }
+                }
+                else if(error.response.status == 402)
+                {
+                    toast.add({
+                            severity: "error",
+                            summary: "Error Message",
+                            detail: error.response.data.message,
+                            life: 3000,
+
+                        })
+
+                } 
+
+                }
+              
 
             })
-         
+
 
         }
 

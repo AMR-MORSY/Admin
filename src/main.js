@@ -27,7 +27,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Paginator from 'primevue/paginator';
 import { Bootstrap5Pagination } from 'laravel-vue-pagination';
-import 'primevue/resources/themes/lara-light-green/theme.css';
+// import 'primevue/resources/themes/lara-light-green/theme.css';
+import  "primevue/resources/themes/saga-blue/theme.css";  
 import  "primevue/resources/primevue.min.css";   
 import MultiSelect from 'primevue/multiselect';
 import InputText from 'primevue/inputtext';
@@ -38,6 +39,8 @@ import ConfirmationService from 'primevue/confirmationservice';
 import Button from 'primevue/button';
 import  "primeicons/primeicons.css";
 import Chip from 'primevue/chip';
+
+
 const app = createApp(App)
 
 

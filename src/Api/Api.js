@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "../router/index";
-import store  from "../vuex/store";
+import store from "../vuex/store";
 
 let Api = axios.create({
   headers: {
@@ -27,8 +27,6 @@ function unauthorizedUnauthintecatedErrorResponse(error) {
     }
   } else if (error.response.status == 401) {
     showUnauthintecatedToast();
-  } else if (error.message == "Network Error") {
-    showNetworkToast();
   }
 }
 function showNetworkToast() {
@@ -38,14 +36,14 @@ function showNetworkToast() {
 }
 
 function showUnauthintecatedToast() {
-    const toastLiveExample = document.getElementById("liveToast");
-    const toastBootstrap = new bootstrap.Toast(toastLiveExample);
-    sessionStorage.removeItem("User");
-    store.dispatch("userData",null)
-    store.dispatch("showUnauthToast", true);
-  
-    toastBootstrap.show();
-  }
+  const toastLiveExample = document.getElementById("liveToast");
+  const toastBootstrap = new bootstrap.Toast(toastLiveExample);
+  sessionStorage.removeItem("User");
+  store.dispatch("userData", null);
+  store.dispatch("showUnauthToast", true);
+
+  toastBootstrap.show();
+}
 
 Api.interceptors.response.use(
   function (response) {
@@ -55,7 +53,12 @@ Api.interceptors.response.use(
   },
   function (error) {
     store.dispatch("displaySpinnerPage", false);
-    unauthorizedUnauthintecatedErrorResponse(error);
+    if (!error.response) {
+      console.log(error)
+      showNetworkToast();
+    } else {
+      unauthorizedUnauthintecatedErrorResponse(error);
+    }
 
     return Promise.reject(error);
   }

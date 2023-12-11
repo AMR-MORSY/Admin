@@ -19,26 +19,27 @@
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <div class="position-sticky pt-3 sidebar-sticky">
           <ul class="nav flex-column">
-            <li class="nav-item" v-for="link in navLinks" @click.prevent="activateClass(link.index)" :key="link.index">
+            <li class="nav-item" v-for="link in navLinks" @click.prevent="activateClass(link.index, navLinks)"
+              :key="link.index">
               <router-link :class="link.class" aria-current="page" :to="link.to">
-             
+
                 <font-awesome-icon :icon="link.icon" />
 
                 {{ link.name }}
               </router-link>
             </li>
-          
+
           </ul>
 
           <h6
             class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-            <span>Saved reports</span>
+            <span>Activities</span>
             <a class="link-secondary" href="#" aria-label="Add a new report">
               <span data-feather="plus-circle" class="align-text-bottom"></span>
             </a>
           </h6>
           <ul class="nav flex-column mb-2">
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="#">
                 <span data-feather="file-text" class="align-text-bottom"></span>
                 Current month
@@ -61,7 +62,18 @@
                 <span data-feather="file-text" class="align-text-bottom"></span>
                 Year-end sale
               </a>
+            </li> -->
+
+            <li class="nav-item" v-for="link in activitesLinks" @click.prevent="activateClass(link.index, activitesLinks)"
+              :key="link.index">
+              <router-link :class="link.class" aria-current="page" :to="link.to">
+
+                <font-awesome-icon :icon="link.icon" />
+
+                {{ link.name }}
+              </router-link>
             </li>
+
           </ul>
         </div>
       </nav>
@@ -115,15 +127,66 @@ export default {
       "index": 3,
       "name": "Permissions"
 
+    },
+
+    ]);
+
+    const activitesLinks = ref([{
+
+      "to": "/dashboard/modifications",
+      "icon": "fa-solid fa-drum",
+      "class": "nav-link",
+      "index": 0,
+      "name": "Modifications"
+
+
+    },
+    {
+
+      "to": "/dashboard/wans",
+      "icon": "fa-solid fa-drum",
+      "class": "nav-link",
+      "index": 1,
+      "name": "WAN"
+
+
+    },
+    {
+
+      "to": "/dashboard/xpics",
+      "icon": "fa-solid fa-drum",
+      "class": "nav-link",
+      "index": 2,
+      "name": "XPIC"
+
+
+    },
+    {
+
+      "to": "/dashboard/ip_trafic",
+      "icon": "fa-solid fa-drum",
+      "class": "nav-link",
+      "index": 3,
+      "name": "IP_trafic"
+
+
     }])
 
-    onMounted(()=>{
+    onMounted(() => {
       activateRoute()
     })
 
-   
+
     const activateRoute = () => {
+      let allLinks = [];
+      activitesLinks.value.forEach((element) => {
+        allLinks.push(element);
+      })
       navLinks.value.forEach(element => {
+        allLinks.push(element);
+
+      });
+      allLinks.forEach(element => {
 
         if (element.to == router.currentRoute.value.path) {
           element.class = "nav-link active";
@@ -139,8 +202,8 @@ export default {
 
     watch(route, activateRoute)
 
-    const activateClass = (link_index) => {
-      navLinks.value.forEach(element => {
+    const activateClass = (link_index, links) => {
+      links.forEach(element => {
 
         if (element.index == link_index) {
           element.class = "nav-link active";
@@ -170,7 +233,7 @@ export default {
 
 
     return {
-      logout, navLinks, activateClass, activateRoute
+      logout, navLinks, activateClass, activateRoute, activitesLinks
     }
   }
 }

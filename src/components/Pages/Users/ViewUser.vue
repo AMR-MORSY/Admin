@@ -39,7 +39,6 @@
 
                     </div>
                 </div>
-
                 <div class="col-md-6">
                     <div class="card  d-flex mt-3 justify-content-center">
                         <MultiSelect v-model="selectedRoles" optionValue="name" optionLabel="name" display="chip"
@@ -61,6 +60,12 @@
 
                     </div>
                 </div>
+           
+
+                <div class="col-12">
+                    <h3>Activities</h3>
+                    <DataTable :data="userActivities"></DataTable>
+                </div>
                 <div class="col-md-6">
                     <button class="btn btn-danger mt-2" @click="goToEdit"> <font-awesome-icon
                             icon="fa-solid fa-pen-to-square" />Edit</button>
@@ -73,9 +78,10 @@
 
 <script>
 import { onMounted, ref } from 'vue';
-import User from "../../../Api/Users";
+
 import { useRouter } from 'vue-router';
 import Users from "../../../Api/Users";
+import DataTable from '../../Helpers/Activities/DataTable.vue';
 
 
 export default {
@@ -91,6 +97,7 @@ export default {
         var selectedPermissions = ref([]);
         var selectedRoles = ref([]);
         var selectedUserRolesMenue = ref([])
+        var userActivities=ref([]);
         const router = useRouter();
 
         onMounted(() => {
@@ -104,9 +111,9 @@ export default {
                 email.value = response.data.user.user.email;
                 name.value = response.data.user.user.name;
                 permissions.value = response.data.user.permissions;
-                // selectedPermissions.value=permissions.value
                 roles.value = response.data.user.user_roles;
-                // selectedRoles.value=roles.value
+                userActivities.value=response.data.user.user_activities;
+        
 
             })
 
@@ -141,7 +148,10 @@ export default {
         }
 
 
-        return { selectedUserRolesMenue, onChangeselectedUserRoles, getUserData, name, email, permissions, roles, selectedPermissions, selectedRoles, goToEdit }
+        return {userActivities, selectedUserRolesMenue, onChangeselectedUserRoles, getUserData, name, email, permissions, roles, selectedPermissions, selectedRoles, goToEdit }
+    },
+    components:{
+        DataTable,
     }
 }
 </script>

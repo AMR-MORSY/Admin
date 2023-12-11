@@ -25,7 +25,7 @@
                                 id
 
                             </span>
-                            <input class="form-control " v-model="rolleForm.id" disabled type="text" />
+                            <input class="form-control " disabled v-model="rolleForm.id" type="text" />
 
                         </div>
                     </div>
@@ -36,29 +36,19 @@
                                 Name
 
                             </span>
-                            <input class="form-control " v-model.trim="rolleForm.name"
-                                :class="{ 'is-invalid': v$.name.$errors.length }" type="text" />
+                            <input class="form-control " disabled v-model.trim="rolleForm.name" />
 
                         </div>
-                        <div v-if="v$.name.$errors">
-                            <div style="color: red; font-size: 0.7rem; padding-left: 3px; padding-top: 3px;"
-                                v-for="error in v$.name.$errors">
-                                {{ error.$message }}</div>
-                        </div>
+
                     </div>
                     <div class="col-md-6">
                         <div class="card  d-flex mt-3 justify-content-center">
                             <MultiSelect v-model="rolleForm.selectedRollPermissions" optionValue="name" display="chip"
                                 :options="permissions" optionLabel="name" filter
-                                placeholder="Permissions assigned to the role" :maxSelectedLabels="100"
-                                :class="{ 'p-invalid': v$.selectedRollPermissions.$errors.length }" />
+                                placeholder="Permissions assigned to the role" :maxSelectedLabels="100" />
                         </div>
                     </div>
-                    <div v-if="v$.selectedRollPermissions.$errors">
-                        <div style="color: red; font-size: 0.7rem; padding-left: 3px; padding-top: 3px;"
-                            v-for="error in v$.selectedRollPermissions.$errors">
-                            {{ error.$message }}</div>
-                    </div>
+
 
                     <div class="col-md-6">
                         <div class="card  d-flex mt-3 justify-content-center">
@@ -66,14 +56,14 @@
                                 optionLabel="name" :options="permissionsDiff" filter placeholder="Other Permissions"
                                 :maxSelectedLabels="100" />
                         </div>
-                    
+
                     </div>
 
                     <div class="col-md-6">
                         <button class="btn btn-danger mt-2" type="submit"> <font-awesome-icon
                                 icon="fa-solid fa-pen-to-square" />Update</button>
                     </div>
-                    <div class="col-md-6" v-if="serverErrors">
+                    <div class="col-md-6" v-if="serverErrors.length">
                         <div v-for="error in serverErrors" :key="error"
                             style="color: red; font-size: 0.7rem; padding-left: 3px; padding-top: 3px;">
                             {{ error }}</div>
@@ -91,8 +81,8 @@
 import { onMounted, reactive, ref } from 'vue';
 import User from "../../../Api/Users";
 import { useRouter } from 'vue-router';
-import { useVuelidate } from '@vuelidate/core'
-import { required, helpers, maxLength, minLength } from '@vuelidate/validators'
+import { useToast } from 'primevue/usetoast';
+
 export default {
     name: "EditRole",
     props: {
@@ -103,31 +93,20 @@ export default {
 
         var permissions = ref([]);
         var permissionsDiff = ref([]);
-        var serverErrors = ref(null)
+        var serverErrors = ref([])
+        const toast = useToast();
 
-        const nameReg = helpers.regex(/^[a-zA-Z]{3,}[a-zA-Z_-]*$/);
 
         const rolleForm = reactive({
             id: "",
             name: "",
-            selectedRollPermissions: "",
-            selectedDiffPermissions: ""
+            selectedRollPermissions: [],
+            selectedDiffPermissions: [],
+            rolePermissions: []
         })
 
-        const rules = {
-            name: {
-                required: helpers.withMessage('Rolle name required', required),
-                nameReg: helpers.withMessage('char. may include(_-)', nameReg),
-                maxLength: helpers.withMessage('30 char. max', maxLength(30)),
-                minLength: helpers.withMessage('at least 3 char', minLength(3))
-
-            },
-            selectedRollPermissions: { required: helpers.withMessage('at least one permission', required) }, // Matches state.lastName
 
 
-        }
-
-        const v$ = useVuelidate(rules, rolleForm);
 
         const router = useRouter();
 
@@ -153,17 +132,19 @@ export default {
             })
 
         }
-
-        async function submitRollForm() {
-            const isFormCorrect = await this.v$.$validate()
-            if (!isFormCorrect) return
-            console.log(rolleForm);
-            User.updateRole(rolleForm).then((response) => {
-                console.log(response)
+        function callServer(data) {
+            console.log(data);
+            User.updateRole(data).then((response) => {
+                toast.add({
+                    severity: "success",
+                    summary: "Success Message",
+                    detail: " Updated Successfully",
+                    life: 3000,
+                });
                 router.push({ path: `/dashboard/viewrole/${props.id}` })
             }).catch((error) => {
                 if (error.response.status == 422) {
-                    serverErrors.value = [];
+                  
                     let errors = error.response.data.errors;
                     if (errors.name) {
                         errors.forEach(element => {
@@ -174,18 +155,13 @@ export default {
 
 
                     }
-                    if (errors.selectedRollPermissions) {
+                    if (errors.rolePermissions) {
                         errors.forEach(element => {
                             serverErrors.value.push(element);
 
                         });
                     }
-                    if (errors.selectedDiffPermissions) {
-                        errors.forEach(element => {
-                            serverErrors.value.push(element);
-
-                        });
-                    }
+                  
 
 
 
@@ -196,7 +172,41 @@ export default {
         }
 
 
-        return { retrieveRoleData, serverErrors, v$, rolleForm, permissions, permissionsDiff, goToEdit, submitRollForm }
+        function submitRollForm() {
+            rolleForm.rolePermissions = [];
+            if (rolleForm.selectedDiffPermissions.length == 0 && rolleForm.selectedRollPermissions.length == 0) {
+                toast.add({
+                    severity: "error",
+                    summary: "Error Message",
+                    detail: "Please choose at least one Permission",
+                    life: 3000,
+                });
+
+            }
+            else {
+                if (rolleForm.selectedDiffPermissions.length > 0) {
+                    rolleForm.selectedDiffPermissions.forEach((element) => {
+                        rolleForm.rolePermissions.push(element);
+                    })
+
+                    callServer(rolleForm);
+                }
+                if (rolleForm.selectedRollPermissions.length > 0) {
+                    rolleForm.selectedRollPermissions.forEach((element) => {
+                        rolleForm.rolePermissions.push(element);
+                    })
+
+                    callServer(rolleForm);
+
+                }
+            }
+
+
+
+        }
+
+
+        return { callServer,retrieveRoleData, serverErrors, rolleForm, permissions, permissionsDiff, goToEdit, submitRollForm }
 
 
 

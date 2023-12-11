@@ -13,6 +13,12 @@ import EditRole from "../components/Pages/Roles/EditRole.vue";
 
 import CreatePermission from "../components/Pages/Permissions/CreatePermission.vue";
 import CreateRole from "../components/Pages/Roles/CreateRole.vue";
+import Modifications from "../components/Pages/Modifications/Modifications.vue";
+import ViewModificationActivity from "../components/Pages/Modifications/ViewModificationActivity.vue";
+import WAN from "../components/Pages/Transmission/WAN.vue";
+import XPIC from "../components/Pages/Transmission/XPIC.vue";
+import IP_trafic from "../components/Pages/Transmission/IPS.vue";
+import ViewTransmissionActivity from "../components/Pages/Transmission/ViewTransmissionActivity.vue";
 import store from "../vuex/store";
 const routes = [
   { path: "/", redirect: "/login" },
@@ -96,6 +102,44 @@ const routes = [
         path: "users",
         name: "Users",
         component: Users,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "modifications",
+        name: "Modifications",
+        component: Modifications,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "modification/activity/:id",
+        name: "ModificationActivity",
+        component: ViewModificationActivity,
+        props:true,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "wans",
+        name: "WAN",
+        component: WAN,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "xpics",
+        name: "XPIC",
+        component: XPIC,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "ip_trafic",
+        name: "IP_trafic",
+        component: IP_trafic,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "Transmission/activity/:id",
+        name: "TransmissionActivity",
+        component: ViewTransmissionActivity,
+        props:true,
         meta: { requiresAuth: true },
       },
     ],
