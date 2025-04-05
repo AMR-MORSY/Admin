@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family:"Signika" ;
+  src: url("./fonts/Signika-VariableFont_GRAD,wght.ttf");
+}
+
+html,
+body {
+  
+ 
+  background-color: #f3f4f6;
+  /* height: 100vh; */
+ 
+  
+  
+}
+

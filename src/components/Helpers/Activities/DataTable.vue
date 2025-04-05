@@ -1,5 +1,5 @@
 <template>
-     <div class="table-responsive-sm">
+     <!-- <div class="table-responsive-sm">
             <table class="table table-hover ">
             <thead>
                 <th scope="col" style="text-align: 5px;">id</th>
@@ -28,7 +28,7 @@
 
         </table>
 
-        </div>
+        </div> -->
 </template>
 
 <script>

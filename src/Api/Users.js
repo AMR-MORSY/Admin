@@ -60,6 +60,10 @@ export default{
     updateUserRoles(data)
     {
         return instances.Api.post("admin/user/role/update",data)
+    },
+    sendPublicNotification(data)
+    {
+        return instances.Api.post('admin/public/notification',data)
     }
    
 }

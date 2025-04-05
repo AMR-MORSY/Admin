@@ -79,7 +79,7 @@
 
 <script>
 import { onMounted, reactive, ref } from 'vue';
-import User from "../../../Api/Users";
+import Users from "../../Api/Users";
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 
@@ -120,7 +120,7 @@ export default {
         }
 
         function retrieveRoleData() {
-            User.getRoleDataWithAllPermissions(props.id).then((response) => {
+            Users.getRoleDataWithAllPermissions(props.id).then((response) => {
                 console.log(response)
                 rolleForm.id = response.data.role.id;
                 rolleForm.name = response.data.role.name;

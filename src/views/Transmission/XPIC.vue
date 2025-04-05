@@ -27,8 +27,8 @@ import { onMounted, ref } from 'vue';
 
 
 
-import Activities from '../../../Api/Activities';
-import DataTable from '../../Helpers/Activities/DataTable.vue';
+import Activities from '../../Api/Activities';
+import DataTable from '../../components/Helpers/Activities/DataTable.vue';
 import { useToast } from 'primevue/usetoast';
 
 

@@ -56,9 +56,9 @@
 
 <script>
 import { onMounted, ref, reactive } from 'vue';
-import User from "../../../Api/Users";
+import Users from "../../Api/Users";
 import { useRouter } from 'vue-router';
-import Activities from '../../../Api/Activities';
+import Activities from '../../Api/Activities';
 export default {
     name: "ViewTransmissionActivity",
     props: {

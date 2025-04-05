@@ -51,7 +51,7 @@
 
 <script>
 import { onMounted, reactive, ref } from 'vue';
-import Users from "../../../Api/Users";
+import Users from "../../Api/Users";
 import { useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core'
 import { required, helpers, maxLength, minLength } from '@vuelidate/validators';
