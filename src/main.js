@@ -28,7 +28,6 @@ import ProgressSpinner from 'primevue/progressspinner';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Paginator from 'primevue/paginator';
-import { Bootstrap5Pagination } from 'laravel-vue-pagination';
 import MultiSelect from 'primevue/multiselect';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';
@@ -137,7 +136,6 @@ app.use(router)
 .component("Chip",Chip)
 .component("Toast",Toast)
 .component("InputText",InputText)
-.component("Pagination",Bootstrap5Pagination)
 .component("Column",Column)
 .component("ProgressSpinner",ProgressSpinner)
 .component('font-awesome-icon', FontAwesomeIcon)

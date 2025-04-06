@@ -2,9 +2,9 @@ import instances from "./Api";
 
 export default{
 
-     getUsers(page)
+     getUsers(page,per_page)
     {
-        return instances.Api.get(`admin/users?page=${page}`);
+        return instances.Api.get(`admin/users?page=${page}&per_page=${per_page}`);
     },
     getUserData(id)
     {

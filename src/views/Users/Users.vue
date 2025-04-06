@@ -87,6 +87,16 @@
           </template>
         </Column>
       </DataTable>
+
+      <div class="w-full flex justify-center my-4 px-2">
+      <Paginator
+        :rows="perPage"
+        :totalRecords="totalRecords"
+        v-model:first="first"
+        :rowsPerPageOptions="[5, 10, 20, 30]"
+        @page="onPageChange"
+      ></Paginator>
+    </div>
     </template>
   </Card>
 </template>
@@ -99,10 +109,28 @@ import Users from "../../Api/Users";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 
-const laravelData = ref({});
+// const laravelData = ref({});
 const users = ref([]);
 const selectedUser = ref();
 const router = useRouter();
+
+
+const totalRecords = ref(0);
+const perPage = ref(5);
+const first = ref(0);
+const page = ref(1);
+const currentPage = ref(1);
+
+
+const onPageChange = (event) => {
+ 
+  first.value = event.first;
+  perPage.value = event.rows;
+  page.value = Math.floor(event.first / event.rows) + 1;
+
+  retrieveUsers();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 onMounted(() => {
   retrieveUsers();
 });
@@ -118,9 +146,12 @@ const goToview = (e) => {
   console.log(userId);
 };
 
-const retrieveUsers = async (page) => {
-  Users.getUsers(page).then((response) => {
-    laravelData.value = response.data.users;
+const retrieveUsers =  () => {
+  Users.getUsers(page.value, perPage.value).then((response) => {
+    console.log(response)
+    totalRecords.value = response.data.users.total;
+    currentPage.value = response.data.users.current_page;
+    // laravelData.value = response.data.users;
     let usersRowData = response.data.users.data;
     usersRowData.forEach((element) => {
       element.edit = "";
@@ -130,45 +161,6 @@ const retrieveUsers = async (page) => {
   });
 };
 
-// export default {
-//     name: "Users",
-//     setup() {
-//         onMounted(() => {
-//             retrieveUsers();
-//         });
-//         const laravelData = ref({});
-//         const users = ref([]);
-//         const selectedUser = ref();
-//         const filters = ref({
-
-//             email: { value: null },
-
-//         });
-//         let userId = ref();
-//         const router = useRouter();
-//         const goToview = (e) => {
-//             userId = selectedUser.value.id;
-//             router.push({path:`/dashboard/viewuser/${userId}`})
-//             console.log(userId)
-//         };
-
-//         const retrieveUsers = async (page) => {
-//             Users.getUsers(page).then((response) => {
-//                 laravelData.value = response.data.users;
-//                 let usersRowData = response.data.users.data;
-//                 usersRowData.forEach((element) => {
-//                     element.edit = "";
-//                     element.view = "";
-//                 });
-//                 users.value = usersRowData;
-//             });
-//         };
-//         return {
-//             retrieveUsers, users, laravelData, goToview, selectedUser, userId, filters
-//         };
-//     },
-//     components: { InputText }
-// }
 </script>
 
 <style lang="scss" scoped></style>
