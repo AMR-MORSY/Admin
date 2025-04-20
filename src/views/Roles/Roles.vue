@@ -1,5 +1,5 @@
 <template>
-  <h1 class="h2">Edit User</h1>
+  <h1 class="h2">Roles</h1>
   <div class="w-full bg-white mt-4 p-9">
     <DataTable
       :value="roles"
@@ -32,7 +32,8 @@
     </DataTable>
   </div>
 
-  <button class="btn btn-danger mt-5" @click="goToCreate">Create New</button>
+  <Button class=" block mr-6" label="Create New" @click.prevent="goToCreate" severity="danger"/>
+ 
 </template>
 
 <script>
