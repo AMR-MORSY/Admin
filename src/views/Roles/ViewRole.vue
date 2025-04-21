@@ -1,5 +1,5 @@
 <template>
-  <h1 class="h2">View Role</h1>
+  <!-- <h1 class="h2">View Role</h1>
 
   <div class="w-full bg-white px-14 py-10">
    
@@ -32,7 +32,41 @@
         </button>
       </div>
    
-  </div>
+  </div> -->
+  <h1 class="text-2xl font-extrabold">View Role</h1>
+  <Card>
+    <template #content>
+      <div class="flex justify-evenly gap-4 flex-wrap">
+        <label class="block">
+          <span class="text-sm text-gray-700">ID</span>
+          <InputText
+            v-model="id"
+            type="name"
+            class="block w-full mt-1 border-gray-200 rounded-md focus:border-indigo-600 focus:ring focus:ring-opacity-40 focus:ring-indigo-500"
+          />
+        </label>
+        <label class="block">
+          <span class="text-sm text-gray-700">Role</span>
+          <InputText
+            v-model="name"
+            type="email"
+            class="block w-full mt-1 border-gray-200 rounded-md focus:border-indigo-600 focus:ring focus:ring-opacity-40 focus:ring-indigo-500"
+          />
+        </label>
+
+        <Button severity="danger" class="block" @click="goToEdit"><font-awesome-icon icon="fa-solid fa-pen-to-square" />EDIT</Button>
+      </div>
+      <label class="block w-2/3 xl:w-1/3 mx-auto">
+        <MultiSelect
+          :options="permissions"
+          filter
+          placeholder="Permissions"
+          :maxSelectedLabels="100"
+          class="block w-full mt-1 border-gray-200 rounded-md focus:border-indigo-600 focus:ring focus:ring-opacity-40 focus:ring-indigo-500"
+        />
+      </label>
+    </template>
+  </Card>
 </template>
 
 <script>

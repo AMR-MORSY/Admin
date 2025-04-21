@@ -1,5 +1,75 @@
 <template>
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+  <h1 class="h2">Edit Role</h1>
+  <div class="w-full bg-white mt-4 p-9">
+    <form @submit.prevent="submitRollForm">
+      <div class="w-full flex flex-wrap justify-evenly gap-1">
+        <label class="block">
+          <span class="text-sm text-gray-700">ID</span>
+          <InputText
+            v-model="rolleForm.id"
+            disabled
+            class="block w-full  border-gray-200 rounded-md focus:border-indigo-600 focus:ring focus:ring-opacity-40 focus:ring-indigo-500"
+          />
+        </label>
+        <label class="block">
+          <span class="text-sm text-gray-700">Name</span>
+          <InputText
+            v-model="rolleForm.name"
+            disabled
+            class="block w-full  border-gray-200 rounded-md focus:border-indigo-600 focus:ring focus:ring-opacity-40 focus:ring-indigo-500"
+          />
+        </label>
+        <label class="block ">
+            <span class="text-sm block text-gray-700">Role Permissions</span>
+          <MultiSelect
+            v-model="rolleForm.selectedRollPermissions"
+            optionValue="name"
+            :options="permissions"
+            optionLabel="name"
+            filter
+            placeholder="Permissions assigned to the role"
+            :maxSelectedLabels="100"
+          />
+        </label>
+
+        <label class="block">
+            <span class="text-sm block text-gray-700">Other Permissions</span>
+          <MultiSelect
+            v-model="rolleForm.selectedDiffPermissions"
+            optionValue="name"
+            optionLabel="name"
+            :options="permissionsDiff"
+            filter
+            placeholder="Other Permissions"
+            :maxSelectedLabels="100"
+          />
+        </label>
+
+        <div class=" mt-6">
+            <Button class=" block" severity="danger" type="submit" > <font-awesome-icon icon="fa-solid fa-pen-to-square" />UPDATE</Button>
+          <!-- <button class="btn btn-danger mt-2" type="submit">
+            <font-awesome-icon icon="fa-solid fa-pen-to-square" />Update
+          </button> -->
+        </div>
+        <div class=" mt-6" v-if="serverErrors.length">
+          <div
+            v-for="error in serverErrors"
+            :key="error"
+            style="
+              color: red;
+              font-size: 0.7rem;
+              padding-left: 3px;
+              padding-top: 3px;
+            "
+          >
+            {{ error }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div
             class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Edit Role</h1>
@@ -74,144 +144,125 @@
                 </div>
             </form>
         </div>
-    </main>
+    </main> -->
 </template>
 
 <script>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from "vue";
 import Users from "../../Api/Users";
-import { useRouter } from 'vue-router';
-import { useToast } from 'primevue/usetoast';
+import { useRouter } from "vue-router";
+import { useToast } from "primevue/usetoast";
 
 export default {
-    name: "EditRole",
-    props: {
-        id: String
-    },
-    setup(props) {
+  name: "EditRole",
+  props: {
+    id: String,
+  },
+  setup(props) {
+    var permissions = ref([]);
+    var permissionsDiff = ref([]);
+    var serverErrors = ref([]);
+    const toast = useToast();
 
+    const rolleForm = reactive({
+      id: "",
+      name: "",
+      selectedRollPermissions: [],
+      selectedDiffPermissions: [],
+      rolePermissions: [],
+    });
 
-        var permissions = ref([]);
-        var permissionsDiff = ref([]);
-        var serverErrors = ref([])
-        const toast = useToast();
+    const router = useRouter();
 
+    onMounted(() => {
+      retrieveRoleData();
+    });
 
-        const rolleForm = reactive({
-            id: "",
-            name: "",
-            selectedRollPermissions: [],
-            selectedDiffPermissions: [],
-            rolePermissions: []
-        })
+    // function goToEdit() {
+    //   router.push({ path: `/dashboard/editrole/${props.id}` });
+    // }
 
+    function retrieveRoleData() {
+      Users.getRoleDataWithAllPermissions(props.id).then((response) => {
+        console.log(response);
+        rolleForm.id = response.data.role.id;
+        rolleForm.name = response.data.role.name;
 
+        permissions.value = response.data.permissions;
 
-
-        const router = useRouter();
-
-        onMounted(() => {
-            retrieveRoleData()
-        })
-
-        function goToEdit() {
-            router.push({ path: `/dashboard/editrole/${props.id}` })
-
-        }
-
-        function retrieveRoleData() {
-            Users.getRoleDataWithAllPermissions(props.id).then((response) => {
-                console.log(response)
-                rolleForm.id = response.data.role.id;
-                rolleForm.name = response.data.role.name;
-
-                permissions.value = response.data.permissions;
-
-                permissionsDiff.value = response.data.permDiff;
-
-            })
-
-        }
-        function callServer(data) {
-            console.log(data);
-            User.updateRole(data).then((response) => {
-                toast.add({
-                    severity: "success",
-                    summary: "Success Message",
-                    detail: " Updated Successfully",
-                    life: 3000,
-                });
-                router.push({ path: `/dashboard/viewrole/${props.id}` })
-            }).catch((error) => {
-                if (error.response.status == 422) {
-                  
-                    let errors = error.response.data.errors;
-                    if (errors.name) {
-                        errors.forEach(element => {
-                            serverErrors.value.push(element);
-
-                        });
-
-
-
-                    }
-                    if (errors.rolePermissions) {
-                        errors.forEach(element => {
-                            serverErrors.value.push(element);
-
-                        });
-                    }
-                  
-
-
-
-
-                }
-            })
-
-        }
-
-
-        function submitRollForm() {
-            rolleForm.rolePermissions = [];
-            if (rolleForm.selectedDiffPermissions.length == 0 && rolleForm.selectedRollPermissions.length == 0) {
-                toast.add({
-                    severity: "error",
-                    summary: "Error Message",
-                    detail: "Please choose at least one Permission",
-                    life: 3000,
-                });
-
-            }
-            else {
-                if (rolleForm.selectedDiffPermissions.length > 0) {
-                    rolleForm.selectedDiffPermissions.forEach((element) => {
-                        rolleForm.rolePermissions.push(element);
-                    })
-
-                    callServer(rolleForm);
-                }
-                if (rolleForm.selectedRollPermissions.length > 0) {
-                    rolleForm.selectedRollPermissions.forEach((element) => {
-                        rolleForm.rolePermissions.push(element);
-                    })
-
-                    callServer(rolleForm);
-
-                }
-            }
-
-
-
-        }
-
-
-        return { callServer,retrieveRoleData, serverErrors, rolleForm, permissions, permissionsDiff, goToEdit, submitRollForm }
-
-
-
+        permissionsDiff.value = response.data.permDiff;
+      });
     }
-}
+    function callServer(data) {
+      console.log(data);
+      Users.updateRole(data)
+        .then((response) => {
+          toast.add({
+            severity: "success",
+            summary: "Success Message",
+            detail: " Updated Successfully",
+            life: 3000,
+          });
+          router.push({ path: `/viewrole/${props.id}` });
+        })
+        .catch((error) => {
+          if (error.response.status == 422) {
+            let errors = error.response.data.errors;
+            if (errors.name) {
+              errors.forEach((element) => {
+                serverErrors.value.push(element);
+              });
+            }
+            if (errors.rolePermissions) {
+              errors.forEach((element) => {
+                serverErrors.value.push(element);
+              });
+            }
+          }
+        });
+    }
+
+    function submitRollForm() {
+      rolleForm.rolePermissions = [];
+      if (
+        rolleForm.selectedDiffPermissions.length == 0 &&
+        rolleForm.selectedRollPermissions.length == 0
+      ) {
+        toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: "Please choose at least one Permission",
+          life: 3000,
+        });
+      } else {
+        if (rolleForm.selectedDiffPermissions.length > 0) {
+          rolleForm.selectedDiffPermissions.forEach((element) => {
+            rolleForm.rolePermissions.push(element);
+          });
+
+          callServer(rolleForm);
+        }
+        if (rolleForm.selectedRollPermissions.length > 0) {
+          rolleForm.selectedRollPermissions.forEach((element) => {
+            rolleForm.rolePermissions.push(element);
+          });
+
+          callServer(rolleForm);
+        }
+      }
+    }
+
+    return {
+      callServer,
+      retrieveRoleData,
+      serverErrors,
+      rolleForm,
+      permissions,
+      permissionsDiff,
+      submitRollForm,
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>
